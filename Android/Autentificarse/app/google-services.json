@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "60273796669",
+    "firebase_url": "https://mary-buds-ddbb8-default-rtdb.firebaseio.com",
+    "project_id": "mary-buds-ddbb8",
+    "storage_bucket": "mary-buds-ddbb8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60273796669:android:d926ff0a8d45ca8f282c54",
+        "android_client_info": {
+          "package_name": "com.example.autentificarse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "60273796669-nvtjc27tg89ltv026i4i0bkcuk9pus4b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSlDtI_j_gdb2yH_1cO0cc4ftXFhCBeeU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "60273796669-nvtjc27tg89ltv026i4i0bkcuk9pus4b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
