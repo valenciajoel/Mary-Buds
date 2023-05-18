@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "sensor-humedad",
+			"path": "indoor v1.0/sensor-humedad"
+		},
+		{
+			"name": "central",
+			"path": "indoor v1.0/central"
+		}
+	],
+	"settings": {}
+}
