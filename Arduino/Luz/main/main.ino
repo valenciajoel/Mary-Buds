@@ -23,8 +23,6 @@ FirebaseConfig config;
 
 unsigned long dataMillis = 0;
 
-int sensorPin = A0;
-
 void setup() {
 
   Serial.begin(115200);
@@ -61,13 +59,16 @@ void setup() {
 
 void loop() {
   if (millis() - dataMillis > 5000) {
-    int humedadValue = humedad();
-    char humedadActual[10];  // Tamaño suficiente para almacenar la cadena de caracteres
-
-    snprintf(humedadActual, sizeof(humedadActual), "%d", humedadValue);
     dataMillis = millis();
-    Serial.printf("Set int... %s\n", Firebase.setString(fbdo, "/test/int", humedadActual) ? "ok" : fbdo.errorReason().c_str());
-    Serial.printf(humedadActual);
+  /*  
+    String datoBdd = Firebase.getString(fbdo, "/test/int");
+    char datoActual[10];  // Tamaño suficiente para almacenar la cadena de caracteres
+
+    snprintf(datoActual, sizeof(datoActual), "%s", datoBdd.c_str());
+    
+    Serial.println(datoActual);
+*/
+    Serial.printf("Get string... %s\n", Firebase.getString(fbdo, F("/test/int")) ? fbdo.to<const char *>() : fbdo.errorReason().c_str());
     /*
         //Serial.printf("Set int... %s\n", Firebase.setInt(fbdo, "/test/int", count++) ? "ok" : fbdo.errorReason().c_str());
         Serial.printf("Ruta... %s\n", Firebase.setInt(fbdo, "/glb777/indoor/sensores/temperatura/ESP-6536/valor", 35) ? "ok" : fbdo.errorReason().c_str());
@@ -79,8 +80,3 @@ void loop() {
   }
 }
 
-int humedad() {
-  int sensorValue = analogRead(sensorPin);               // Lee el valor analógico del pin D0
-  float humidity = map(sensorValue, 1023, 577, 0, 100);  // Convierte el valor analógico en un porcentaje de humedad
-  return humidity;
-}
