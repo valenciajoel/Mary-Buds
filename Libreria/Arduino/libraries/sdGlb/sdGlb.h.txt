@@ -1,0 +1,284 @@
+#include <SD.h>
+
+
+
+class SdGlb{
+
+    private:
+
+    //VARIABLES
+    int _pinSd;
+ 
+
+    public:
+    SdGlb(int pinSd){
+     //CONSTRUCTORES
+    _pinSd = pinSd;
+    if (!SD.begin(_pinSd)) {
+    Serial.println("Error, compruebe si la tarjeta está presente.");
+  }else{  //si llego aqui es porque la tarjeta fue inicializada correctamente  
+  Serial.println("Tarjeta inicializada.");}
+
+    }
+
+    //CABECERAS
+
+    bool escribirArchivo(String nombreArchivo, String texto, boolean nuevaLinea);
+    bool existe(String ruta); 
+    bool eliminar(String ruta);
+    String leerArchivo(String ruta); 
+    int contarArchivos(String ruta);
+    File abrirArchivo(String ruta);
+    int  contarArchivosTotales(String ruta);
+    String parsearCSV(String texto, int columnaDato, char separador);
+    void eliminarCarpeta(String ruta);
+    void eliminarArchivos (String ruta);
+    int contar(String ruta, bool archivo, bool carpeta);
+    void eliminarDirectorio(String ruta);
+    //String ipToString(IPAddress ip);
+    
+};
+
+int SdGlb :: contarArchivos(String ruta){
+  int cont=-1;
+  if(existe(ruta)){
+    cont=0;
+  File dir = SD.open(ruta);
+  yield();
+  File archivo = dir.openNextFile();
+  while(archivo){
+    if(!archivo.isDirectory()){cont++;}
+    archivo = dir.openNextFile();
+    dir.close();
+  }
+  }
+  return cont;
+}
+
+
+int SdGlb :: contar(String ruta, bool archivo, bool carpeta){
+  int cont=-1;
+  if(existe(ruta)){
+    cont=0;
+  File dir = SD.open(ruta);
+  yield();
+  File archivo = dir.openNextFile();
+  while(archivo){
+    if(archivo.isDirectory() && carpeta){cont++;}
+    if(!archivo.isDirectory() && archivo){cont++;}
+    archivo = dir.openNextFile();
+    dir.close();
+  }
+  }
+  return cont;
+}
+
+
+
+void SdGlb :: eliminarArchivos (String ruta){
+
+  if(existe(ruta)){
+  File dir = SD.open(ruta);
+  yield();
+  File archivo = dir.openNextFile();
+  while(archivo){
+    if(!archivo.isDirectory()){
+
+      eliminar(ruta+"/"+archivo.name());
+    }
+    archivo = dir.openNextFile();
+    dir.close();
+  }
+  archivo.close();
+  }
+
+
+}
+
+
+
+void SdGlb :: eliminarCarpeta(String ruta){
+
+  //NUEVO
+
+  // VARIABLES
+   File root;
+   File archivo;
+  // String rutaAux;
+
+  if(existe(ruta)){
+    root = abrirArchivo(ruta);
+    archivo = root.openNextFile();
+
+   while(contar(ruta,true,true)){
+    if(archivo.isDirectory()){
+
+    //int archivosTotales = contarArchivos(ruta+"/"+archivo.name());
+     //File carpeta = abrirArchivo(ruta+"/"+archivo.name());
+    Serial.print(ruta+"/");
+    Serial.println(archivo.name());
+    eliminarCarpeta(ruta+"/"+archivo.name());
+
+    
+
+    //Serial.print("Archivos totales:");
+    //Serial.println(String (archivosTotales));
+
+    }else{
+    eliminar(ruta+"/"+archivo.name());
+    //Serial.print("Archivo:");
+    //Serial.println(archivo.name());
+    }
+
+/*
+    if(!archivo.isDirectory()){
+      eliminar(ruta+"/"+archivo.name());
+    }
+    else{
+         // int archivosTotales = contarArchivos(ruta+"/"+archivo.name());
+          //File carpeta = abrirArchivo(ruta+"/"+archivo.name());
+          Serial.print("Carpeta");
+        //  Serial.println(String (archivosTotales));
+    }
+*/
+    archivo = root.openNextFile();
+
+    }
+
+
+archivo.close();
+root.close();
+
+eliminarDirectorio(ruta);
+}
+  
+  
+  }
+
+
+void SdGlb :: eliminarDirectorio(String ruta){
+  Serial.print(ruta);
+  Serial.println(" CARPETA ELIMINADA");
+  SD.rmdir(ruta);
+  
+}
+
+int SdGlb :: contarArchivosTotales(String ruta){
+  int cont=-1;
+  if(existe(ruta)){
+    cont=0;
+  File dir = SD.open(ruta);
+  yield();
+  File archivo = dir.openNextFile();
+  while(archivo){
+
+    if(archivo.isDirectory()){
+      String rutaDirectorio = ruta + archivo.name();
+      int archivosTotalesDirectorio = contarArchivos(rutaDirectorio);
+      cont += archivosTotalesDirectorio;
+    }
+
+    if(!archivo.isDirectory()){cont++;}
+    archivo = dir.openNextFile();
+    dir.close();
+  }
+  }
+  return cont;
+}
+
+
+
+bool SdGlb :: existe(String ruta){
+  return SD.exists(ruta);
+  }
+
+  bool SdGlb :: eliminar(String ruta){
+  Serial.print(ruta);
+  Serial.println(" ELIMINADO");
+  return SD.remove(ruta);
+  }
+
+File SdGlb  :: abrirArchivo(String ruta){
+return SD.open(ruta);
+}
+
+
+String SdGlb :: leerArchivo(String ruta){
+    String contenido="";
+    char c;
+  File file = SD.open(ruta);
+ while(file.available()){
+   c= (char) file.read() ;
+
+
+   
+   contenido += String(c);
+    
+  }
+  file.close();
+
+return contenido;
+
+}
+
+bool SdGlb :: escribirArchivo(String nombreArchivo,String texto, boolean nuevaLinea){
+  File archivo = SD.open(nombreArchivo, FILE_WRITE);	// apertura para lectura/escritura de archivo prueba.txt
+  bool respuesta= false;
+  
+  Serial.print("Abriendo archivo:");
+  Serial.println(nombreArchivo);
+  Serial.print("Texto a escribir:");
+  Serial.println(texto);	// texto en monitor serie
+
+  if (archivo) {
+    if(nuevaLinea){archivo.println(texto);}else{archivo.print(texto);}
+    	// escritura de una linea de texto en archivo
+
+    archivo.close();				// cierre del archivo
+    respuesta= true;
+    Serial.println("escritura correcta");	// texto de escritura correcta en monitor serie
+  } else {
+    Serial.println("error en escritura de archivo");	// texto de falla en apertura de archivo
+  }
+
+  return respuesta;
+}
+
+
+
+
+String SdGlb ::  parsearCSV(String texto, int columnaDato, char separador){
+
+  //VARIABLES
+  String respuesta = "";
+  int str_len = texto.length() + 1;
+  int cont = 0;
+  int posInicio = 0;
+  int posFinal = 0;
+  int contSeparador = 1;
+  bool encontrado = false;
+  char char_array[str_len];
+
+  //paso de string a array de char
+  texto.toCharArray(char_array, str_len);
+
+  while (contSeparador != columnaDato && cont < str_len)
+  {
+
+    if (char_array[cont] == separador)
+    {
+      contSeparador++;
+    }
+    cont++;
+  }
+
+  while (char_array[cont] != separador && cont < str_len - 1)
+  {
+    respuesta += String(char_array[cont]);
+    cont++;
+  }
+
+  //retorno
+  return respuesta;
+}
+    
